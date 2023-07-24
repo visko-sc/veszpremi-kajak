@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "veszpremi-kajak"
+version = "1.0.0"
+description = ""
+authors = ["Peter Viskovics <peter.viskovics@strivacity.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+slack_sdk = '*'
+aiohttp = '*'
+python-dotenv = '*'
+dataclasses-jsonschema = '*'
+Pillow = '9.5.0'  # pinned because latest easyocr doesn't work yet with 10.x
+easyocr = '*'
+facebook-page-scraper = '5.0.2'  # pinned because poetry didn't find it otherwise...
+
+[tool.poetry.group.dev.dependencies]
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

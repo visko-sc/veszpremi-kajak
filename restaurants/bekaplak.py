@@ -1,13 +1,14 @@
 import json
 import os.path
 import re
+from difflib import get_close_matches
 from pathlib import Path
 
 import requests
 from easyocr import easyocr
 from facebook_page_scraper import Facebook_scraper
 
-from common.constants import DOWNLOAD_DIR, DAY_OF_WEEK, TODAY
+from common.constants import DOWNLOAD_DIR, DAY_OF_WEEK, TODAY, DAYS
 
 IGNORED_LINES = [
     '4',  # ez igazából a "A menü zóna adag ételeket tartalmaz" szövegből az "A" betű...
@@ -56,20 +57,8 @@ class Bekaplak():
         meals_per_day = {}
         current_day = -1
         for line in lines:
-            if line in ['HÉTEÓ', 'HÉTFŐ', 'HÉIFÓ']:
-                current_day = 0
-                continue
-            elif line in ['KEDD']:
-                current_day = 1
-                continue
-            elif line in ['SZERDA']:
-                current_day = 2
-                continue
-            elif line in ['CSÜTÖRTÖK']:
-                current_day = 3
-                continue
-            elif line in ['PÉNTEK', 'PÉNIEK']:
-                current_day = 4
+            if matches := get_close_matches(line, DAYS, n=1):
+                current_day = DAYS.index(matches[0])
                 continue
             if line in IGNORED_LINES:
                 continue

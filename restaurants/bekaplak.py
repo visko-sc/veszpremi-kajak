@@ -1,15 +1,13 @@
 import json
 import os.path
 import re
-from datetime import datetime
-from os.path import dirname
 from pathlib import Path
 
 import requests
 from easyocr import easyocr
 from facebook_page_scraper import Facebook_scraper
 
-from common.constants import DOWNLOAD_DIR
+from common.constants import DOWNLOAD_DIR, DAY_OF_WEEK, TODAY
 
 IGNORED_LINES = [
     '4',  # ez igazából a "A menü zóna adag ételeket tartalmaz" szövegből az "A" betű...
@@ -30,8 +28,7 @@ def _merge_lines_split_by_ocr(lines):
 class Bekaplak():
     def __init__(self):
         self.reader = easyocr.Reader(['hu'])
-        today = datetime.today().strftime('%Y-%m-%d')
-        self.download_dir = f'{DOWNLOAD_DIR}/{today}/bekaplak'
+        self.download_dir = f'{DOWNLOAD_DIR}/{TODAY}/bekaplak'
         Path(self.download_dir).mkdir(parents=True, exist_ok=True)
         if not os.path.exists(f'{self.download_dir}/bekaplak_2.jpg'):
             self._download_daily_menu_from_facebook()
@@ -56,7 +53,6 @@ class Bekaplak():
     def mai_menu(self):
         result = self.reader.readtext(f'{self.download_dir}/bekaplak_2.jpg')
         lines = [x[1] for x in result[:-1]]
-        day_of_week = datetime.today().weekday()
         meals_per_day = {}
         current_day = -1
         for line in lines:
@@ -84,7 +80,7 @@ class Bekaplak():
                     meals_per_day[current_day] = [line]
             else:
                 continue
-        return '\n'.join(meals_per_day[day_of_week])
+        return '\n'.join(meals_per_day[DAY_OF_WEEK])
 
 
 if __name__ == '__main__':

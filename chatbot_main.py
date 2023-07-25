@@ -5,6 +5,7 @@ from datetime import datetime
 from dotenv import load_dotenv
 from slack_sdk import WebClient
 
+from common.constants import DAY_OF_WEEK
 from restaurants.bekaplak import Bekaplak
 from restaurants.kekfeny import Kekfeny
 from restaurants.panorama import Panorama
@@ -22,7 +23,7 @@ napi_ajanlatok = f'*Napi ajánlatok*:\n{bekaplak.napi_ajanlat()}'
 client.chat_postMessage(channel=channel_id, thread_ts=response['ts'], text=napi_ajanlatok)
 
 NAPOK = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek']
-nap = NAPOK[datetime.today().weekday()]
+nap = NAPOK[DAY_OF_WEEK]
 client.files_upload_v2(file_uploads=[
     {"file": Panorama().file_path,
      "title": "Panoráma Snack"},

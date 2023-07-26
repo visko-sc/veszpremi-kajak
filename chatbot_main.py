@@ -1,13 +1,15 @@
 import logging
 import os
 from datetime import datetime
+from pathlib import Path
 
 from dotenv import load_dotenv
 from slack_sdk import WebClient
 
-from common.constants import DAY_OF_WEEK
+from common.constants import DAY_OF_WEEK, DAYS, DOWNLOAD_DIR, YEAR_AND_WEEK
 from restaurants.bekaplak import Bekaplak
 from restaurants.kekfeny import Kekfeny
+from restaurants.metisz import Metisz
 from restaurants.panorama import Panorama
 
 logger = logging.getLogger(__name__)
@@ -22,15 +24,18 @@ response = client.chat_postMessage(channel=channel_id, text=f'*Bekaplak mai men�
 napi_ajanlatok = f'*Napi ajánlatok*:\n{bekaplak.napi_ajanlat()}'
 client.chat_postMessage(channel=channel_id, thread_ts=response['ts'], text=napi_ajanlatok)
 
-NAPOK = ['hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek']
-nap = NAPOK[DAY_OF_WEEK]
+weekly_download_dir = f'{DOWNLOAD_DIR}/{YEAR_AND_WEEK}'
+Path(weekly_download_dir).mkdir(parents=True, exist_ok=True)
+
+nap = DAYS[DAY_OF_WEEK].lower()
 client.files_upload_v2(file_uploads=[
-    {"file": Panorama().file_path,
+    {"file": Panorama(weekly_download_dir).file_path,
      "title": "Panoráma Snack"},
-    {"file": Kekfeny().file_path,
+    {"file": Kekfeny(weekly_download_dir).file_path,
      "title": "Kékfény Étterem"},
+    {"file": Metisz(weekly_download_dir).file_path,
+     "title": "Metisz Kisvendéglő"},
 ], channel=channel_id, initial_comment=f'Környékbeli ajánlatok (ma: {datetime.today().strftime("%m.%d.")} {nap})')
 
 # TBD
-# metisz
 # papírkutya

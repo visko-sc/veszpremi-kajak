@@ -1,29 +1,22 @@
 import os
-from datetime import datetime
 from pathlib import Path
 
 import requests
 from easyocr import easyocr
 
-from common.constants import DOWNLOAD_DIR
-
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko)' \
-             ' Chrome/114.0.0.0 Safari/537.36'  # else we get 403 :(
+from common.constants import USER_AGENT
 
 
 class Kekfeny:
-    def __init__(self):
-        today = datetime.today().strftime('%Y-%m-%d')
-        self.download_dir = f'{DOWNLOAD_DIR}/{today}'
-        self.file_path = f'{self.download_dir}/kekfeny.png'
-        Path(self.download_dir).mkdir(parents=True, exist_ok=True)
+    def __init__(self, download_dir: str):
+        self.file_path = f'{download_dir}/kekfeny.png'
         if not os.path.exists(self.file_path):
             self._download_menu_from_website()
 
     def _download_menu_from_website(self):
         with open(self.file_path, 'wb') as image_file:
             image_file.write(requests.get('https://www.etel-hazhozszallitas.hu/images/etlap/etlap.png',
-                                          headers={'User-Agent': USER_AGENT}).content)
+                                          headers=USER_AGENT).content)
 
     def lines(self):
         reader = easyocr.Reader(['hu'])
@@ -32,4 +25,9 @@ class Kekfeny:
 
 
 if __name__ == '__main__':
-    print(Kekfeny().file_path)
+    from pathlib import Path
+    from common.constants import DOWNLOAD_DIR, YEAR_AND_WEEK
+
+    weekly_download_dir = f'{DOWNLOAD_DIR}/{YEAR_AND_WEEK}'
+    Path(weekly_download_dir).mkdir(parents=True, exist_ok=True)
+    print(Kekfeny(weekly_download_dir).file_path)

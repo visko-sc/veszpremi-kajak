@@ -1,21 +1,13 @@
 import json
 import os.path
-from difflib import get_close_matches
-from pathlib import Path
 
 import requests
-from easyocr import easyocr
 from facebook_page_scraper import Facebook_scraper
-
-from common.constants import DOWNLOAD_DIR, DAY_OF_WEEK, TODAY, DAYS, YEAR_AND_WEEK
 
 
 class Metisz():
-    def __init__(self):
-        self.reader = easyocr.Reader(['hu'])
-        self.download_dir = f'{DOWNLOAD_DIR}/{YEAR_AND_WEEK}'
-        Path(self.download_dir).mkdir(parents=True, exist_ok=True)
-        self.file_path = f'{self.download_dir}/metisz.jpg'
+    def __init__(self, download_dir: str):
+        self.file_path = f'{download_dir}/metisz.jpg'
         if not os.path.exists(self.file_path):
             self._download_daily_menu_from_facebook()
 
@@ -28,4 +20,9 @@ class Metisz():
 
 
 if __name__ == '__main__':
-    print(Metisz().file_path)
+    from pathlib import Path
+    from common.constants import DOWNLOAD_DIR, YEAR_AND_WEEK
+
+    weekly_download_dir = f'{DOWNLOAD_DIR}/{YEAR_AND_WEEK}'
+    Path(weekly_download_dir).mkdir(parents=True, exist_ok=True)
+    print(Metisz(weekly_download_dir).file_path)

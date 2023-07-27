@@ -15,6 +15,7 @@ Pillow = '9.5.0'  # pinned because latest easyocr doesn't work yet with 10.x
 easyocr = '*'
 requests = '*'
 facebook-page-scraper = '5.0.2'  # pinned because poetry didn't find it otherwise...
+beautifulsoup4 = '*'
 
 [tool.poetry.group.dev.dependencies]
 [build-system]

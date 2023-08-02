@@ -29,8 +29,11 @@ client.chat_postMessage(channel=channel_id, thread_ts=response['ts'], text=napi_
 
 allegro = Allegro()
 response = client.chat_postMessage(channel=channel_id, text=f'*Allegro napi menü* (1890Ft):\n{allegro.napi_menu()}')
-napi_ajanlatok = allegro.napi_ajanlat()
-client.chat_postMessage(channel=channel_id, thread_ts=response['ts'], text=napi_ajanlatok)
+client.chat_postMessage(channel=channel_id, thread_ts=response['ts'], text=allegro.napi_ajanlat())
+
+metisz = Metisz()
+response = client.chat_postMessage(channel=channel_id, text=f'*Metisz napi menü* (2300Ft):\n{metisz.napi_menu()}')
+client.chat_postMessage(channel=channel_id, thread_ts=response['ts'], text=metisz.etlap())
 
 weekly_download_dir = f'{DOWNLOAD_DIR}/{YEAR_AND_WEEK}'
 Path(weekly_download_dir).mkdir(parents=True, exist_ok=True)
@@ -41,8 +44,6 @@ client.files_upload_v2(file_uploads=[
      "title": "Panoráma Snack"},
     {"file": Kekfeny(weekly_download_dir).file_path,
      "title": "Kékfény Étterem"},
-    {"file": Metisz(weekly_download_dir).file_path,
-     "title": "Metisz Kisvendéglő"},
 ], channel=channel_id, initial_comment=f'Környékbeli ajánlatok (ma: {datetime.today().strftime("%m.%d.")} {nap})')
 
 # TBD

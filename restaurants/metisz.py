@@ -1,28 +1,28 @@
-import json
-import os.path
-
 import requests
-from facebook_page_scraper import Facebook_scraper
+from bs4 import BeautifulSoup
+
+from common.constants import DAY_OF_WEEK, DAYS
 
 
 class Metisz():
-    def __init__(self, download_dir: str):
-        self.file_path = f'{download_dir}/metisz.jpg'
-        if not os.path.exists(self.file_path):
-            self._download_daily_menu_from_facebook()
+    def napi_menu(self):
+        etlap = BeautifulSoup(requests.get('https://www.metiszvendeglo.hu/napi-menu/').text, 'html.parser')
+        mai_selector = f'#main .wp-block-group:nth-child({DAY_OF_WEEK + 3}) h3'
+        a_menu = '\n'.join([f'*A menü* ({DAYS[DAY_OF_WEEK].lower()})'] + [e.text for e in etlap.select(mai_selector)])
+        b_menu_selector = f'#main .wp-block-group:nth-child(8) h3'
+        b_menu = '\n'.join(['*B menü*'] + [e.text for e in etlap.select(b_menu_selector)])
+        return f'{a_menu}\n{b_menu}'
 
-    def _download_daily_menu_from_facebook(self):
-        posts = Facebook_scraper('metiszkisvendeglo', 1, 'firefox', headless=False)
-        post_data = json.loads(posts.scrap_to_json())
-        first_post = next(iter((post_data.values())))
-        with open(self.file_path, 'wb') as image_file:
-            image_file.write(requests.get(first_post['image'][0]).content)
+    def etlap(self):
+        etlap = BeautifulSoup(requests.get('https://www.metiszvendeglo.hu/etlap/').text, 'html.parser')
+        results = []
+        for i in range(4, 4 + len(etlap.select('#main .wp-block-heading')), 2):
+            results.append('*' + etlap.select(f'#main h2.wp-block-heading:nth-child({i})')[0].text + '*')
+            results += ['  ' + i.text for i in etlap.select(f'#main figure.wp-block-table:nth-child({i + 1}) tr')]
+        return '\n'.join(results)
 
 
 if __name__ == '__main__':
-    from pathlib import Path
-    from common.constants import DOWNLOAD_DIR, YEAR_AND_WEEK
-
-    weekly_download_dir = f'{DOWNLOAD_DIR}/{YEAR_AND_WEEK}'
-    Path(weekly_download_dir).mkdir(parents=True, exist_ok=True)
-    print(Metisz(weekly_download_dir).file_path)
+    metisz = Metisz()
+    print(metisz.napi_menu())
+    print(metisz.etlap())

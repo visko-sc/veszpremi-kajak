@@ -8,7 +8,7 @@ from bs4 import BeautifulSoup
 class Allegro():
     def __init__(self):
         self.etlap = BeautifulSoup(requests.get('https://allegrocafe.hu/').text, 'html.parser')
-        today = datetime.today().strftime('%Y. %B %d').casefold()
+        today = datetime.today().strftime('%Y. %B %-d').casefold()
         assert self.etlap.select('.daily-menu h3')[0].text.strip().casefold().startswith(today)
 
     def napi_menu(self):

@@ -1,10 +1,11 @@
+import locale
 import os
-from pathlib import Path
+from datetime import datetime
 
 import requests
 from easyocr import easyocr
 
-from common.constants import USER_AGENT
+from common.constants import USER_AGENT, LAST_UPDATED_PATTERN, THIS_MONDAY_0_AM
 
 
 class Kekfeny:
@@ -14,9 +15,14 @@ class Kekfeny:
             self._download_menu_from_website()
 
     def _download_menu_from_website(self):
+        response = requests.get('https://www.etel-hazhozszallitas.hu/images/etlap/etlap.png', headers=USER_AGENT)
+        locale_to_restore = locale.getlocale()
+        locale.setlocale(locale.LC_TIME, "en_US")
+        last_modified_ts = datetime.strptime(response.headers['last-modified'], LAST_UPDATED_PATTERN).timestamp()
+        locale.setlocale(locale.LC_TIME, locale_to_restore[0])
+        assert THIS_MONDAY_0_AM.timestamp() < last_modified_ts
         with open(self.file_path, 'wb') as image_file:
-            image_file.write(requests.get('https://www.etel-hazhozszallitas.hu/images/etlap/etlap.png',
-                                          headers=USER_AGENT).content)
+            image_file.write(response.content)
 
     def lines(self):
         reader = easyocr.Reader(['hu'])

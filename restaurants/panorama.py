@@ -13,10 +13,10 @@ class Panorama:
             self._download_menu_from_website()
 
     def _download_menu_from_website(self):
+        response = requests.get(f'http://www.panoramasnack.hu/images/menu{WEEK_OF_THE_YEAR}.jpg', headers=USER_AGENT)
         with open(self.file_path, 'wb') as image_file:
             # be aware that pdf exists (instead of ocr?)
-            image_file.write(requests.get(f'http://www.panoramasnack.hu/images/menu{WEEK_OF_THE_YEAR}.jpg',
-                                          headers=USER_AGENT).content)
+            image_file.write(response.content)
 
     def lines(self):
         reader = easyocr.Reader(['hu'])

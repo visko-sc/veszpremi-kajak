@@ -39,12 +39,15 @@ weekly_download_dir = f'{DOWNLOAD_DIR}/{YEAR_AND_WEEK}'
 Path(weekly_download_dir).mkdir(parents=True, exist_ok=True)
 
 nap = DAYS[DAY_OF_WEEK].lower()
-client.files_upload_v2(file_uploads=[
-    {"file": Panorama(weekly_download_dir).file_path,
-     "title": "Panoráma Snack"},
-    {"file": Kekfeny(weekly_download_dir).file_path,
-     "title": "Kékfény Étterem"},
-], channel=channel_id, initial_comment=f'Környékbeli ajánlatok (ma: {datetime.today().strftime("%m.%d.")} {nap})')
+try:
+    client.files_upload_v2(file_uploads=[
+        {"file": Panorama(weekly_download_dir).file_path,
+         "title": "Panoráma Snack"},
+        {"file": Kekfeny(weekly_download_dir).file_path,
+         "title": "Kékfény Étterem"},
+    ], channel=channel_id, initial_comment=f'Környékbeli ajánlatok (ma: {datetime.today().strftime("%m.%d.")} {nap})')
+except:  # noqa
+    client.chat_postMessage(channel=channel_id, text=f'Panoráma vagy Kékfény még nem töltötte fel az ehetit')
 
 # TBD
 # papírkutya
